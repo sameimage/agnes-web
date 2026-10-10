@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agnes Video Generator — Free AI Video & Image</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+    color: #fff;
+    min-height: 100vh;
+    padding: 20px;
+  }
+  .container { max-width: 800px; margin: 0 auto; }
+  h1 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 10px;
+    background: linear-gradient(90deg, #ff6b9d, #c084fc, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle { text-align: center; color: #aaa; margin-bottom: 30px; font-size: 0.9rem; }
+  .card {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 24px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+  }
+  .card h2 { font-size: 1.1rem; margin-bottom: 16px; color: #c084fc; }
+  input, textarea, select {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 12px;
+  }
+  textarea { min-height: 100px; resize: vertical; }
+  input:focus, textarea:focus, select:focus {
+    outline: none;
+    border-color: #c084fc;
+  }
+  .row { display: flex; gap: 10px; }
+  .row > * { flex: 1; }
+  button {
+    background: linear-gradient(90deg, #ff6b9d, #c084fc);
+    border: none;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: transform 0.2s, opacity 0.2s;
+    width: 100%;
+  }
+  button:hover:not(:disabled) { transform: scale(1.02); }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
+  button.secondary {
+    background: rgba(255,255,255,0.1);
+    font-weight: normal;
+  }
+  .status {
+    padding: 12px;
+    border-radius: 8px;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    display: none;
+  }
+  .status.info { background: rgba(96,165,250,0.2); border: 1px solid #60a5fa; display: block; }
+  .status.error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; display: block; }
+  .status.success { background: rgba(34,197,94,0.2); border: 1px solid #22c55e; display: block; }
+  .output { margin-top: 16px; text-align: center; }
+  .output img, .output video {
+    max-width: 100%;
+    border-radius: 12px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .key-hint { font-size: 0.8rem; color: #888; margin-top: 8px; }
+  .key-hint a { color: #60a5fa; }
+  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    text-align: center;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .tab.active {
+    background: linear-gradient(90deg, #ff6b9d, #c084fc);
+    border-color: transparent;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>🎬 Agnes Video Generator</h1>
+  <p class="subtitle">Free AI video & image generator — built on Agnes AI</p>
+
+  <!-- API Key -->
+  <div class="card">
+    <h2>🔑 API Key</h2>
+    <input type="password" id="apiKey" placeholder="sk-..." />
+    <div class="row">
+      <button onclick="saveKey()">ذخیره</button>
+      <button class="secondary" onclick="clearKey()">پاک کردن</button>
+    </div>
+    <p class="key-hint">کلید رو از <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> بگیر. فقط توی مرورگر خودت ذخیره میشه.</p>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tabs">
+    <div class="tab active" onclick="switchTab('video')">🎥 ویدیو</div>
+    <div class="tab" onclick="switchTab('image')">🖼️ عکس</div>
+  </div>
+
+  <!-- Video Panel -->
+  <div class="card" id="videoPanel">
+    <h2>🎥 ساخت ویدیو</h2>
+    <textarea id="videoPrompt" placeholder="Describe the video you want, e.g. A girl swimming in a pool, cinematic, slow motion..."></textarea>
+    <div class="row">
+      <select id="videoAspect">
+        <option value="16:9">16:9 افقی</option>
+        <option value="9:16">9:16 عمودی</option>
+        <option value="1:1">1:1 مربع</option>
+      </select>
+      <select id="videoDuration">
+        <option value="5">۵ ثانیه</option>
+        <option value="10">۱۰ ثانیه</option>
+        <option value="12" selected>۱۲ ثانیه</option>
+        <option value="20">۲۰ ثانیه</option>
+      </select>
+    </div>
+    <button id="videoBtn" onclick="generateVideo()">🎬 ساخت ویدیو</button>
+    <div class="status" id="videoStatus"></div>
+    <div class="output" id="videoOutput"></div>
+  </div>
+
+  <!-- Image Panel -->
+  <div class="card" id="imagePanel" style="display:none;">
+    <h2>🖼️ ساخت عکس</h2>
+    <textarea id="imagePrompt" placeholder="Describe the image you want, e.g. A Shiba Inu smiling under a cherry blossom tree..."></textarea>
+    <select id="imageSize">
+      <option value="1024x1024">1:1 مربع</option>
+      <option value="1344x768">16:9 افقی</option>
+      <option value="768x1344">9:16 عمودی</option>
+    </select>
+    <button id="imageBtn" onclick="generateImage()">🖼️ ساخت عکس</button>
+    <div class="status" id="imageStatus"></div>
+    <div class="output" id="imageOutput"></div>
+  </div>
+</div>
+
+<script>
+const API_BASE = 'https://api.agnes-ai.com/v1'; // آدرس API — اگه فرق داره تغییر بده
+
+// ===== API Key Management =====
+function saveKey() {
+  const key = document.getElementById('apiKey').value.trim();
+  if (!key) return alert('کلید رو وارد کن');
+  localStorage.setItem('agnes_api_key', key);
+  showStatus('videoStatus', '✅ کلید ذخیره شد', 'success');
+  setTimeout(() => hideStatus('videoStatus'), 2000);
+}
+function clearKey() {
+  localStorage.removeItem('agnes_api_key');
+  document.getElementById('apiKey').value = '';
+  alert('کلید پاک شد');
+}
+function getKey() {
+  return localStorage.getItem('agnes_api_key') || '';
+}
+window.addEventListener('DOMContentLoaded', () => {
+  const k = getKey();
+  if (k) document.getElementById('apiKey').value = k;
+});
+
+// ===== Tabs =====
+function switchTab(tab) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('videoPanel').style.display = tab === 'video' ? 'block' : 'none';
+  document.getElementById('imagePanel').style.display = tab === 'image' ? 'block' : 'none';
+}
+
+// ===== Status Helpers =====
+function showStatus(id, msg, type) {
+  const el = document.getElementById(id);
+  el.textContent = msg;
+  el.className = 'status ' + type;
+}
+function hideStatus(id) {
+  document.getElementById(id).className = 'status';
+}
+
+// ===== Generate Video =====
+async function generateVideo() {
+  const key = getKey();
+  if (!key) return alert('اول API Key رو ذخیره کن');
+
+  const prompt = document.getElementById('videoPrompt').value.trim();
+  if (!prompt) return alert('پرامپت رو وارد کن');
+
+  const aspect = document.getElementById('videoAspect').value;
+  const duration = document.getElementById('videoDuration').value;
+
+  const btn = document.getElementById('videoBtn');
+  btn.disabled = true;
+  showStatus('videoStatus', '⏳ در حال ساخت ویدیو... (ممکنه چند دقیقه طول بکشه)', 'info');
+  document.getElementById('videoOutput').innerHTML = '';
+
+  try {
+    // مرحله ۱: ارسال درخواست
+    const createRes = await fetch(`${API_BASE}/videos`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        prompt: prompt,
+        aspect_ratio: aspect,
+        duration: parseInt(duration)
+      })
+    });
+
+    if (!createRes.ok) {
+      const err = await createRes.text();
+      throw new Error(`HTTP ${createRes.status}: ${err}`);
+    }
+
+    const createData = await createRes.json();
+    const taskId = createData.id || createData.task_id;
+
+    if (!taskId) throw new Error('Task ID دریافت نشد');
+
+    showStatus('videoStatus', `⏳ تسک ساخته شد (${taskId}). در حال پردازش...`, 'info');
+
+    // مرحله ۲: Polling
+    let attempts = 0;
+    const maxAttempts = 120; // ۱۰ دقیقه
+    while (attempts < maxAttempts) {
+      await new Promise(r => setTimeout(r, 5000));
+      attempts++;
+
+      const pollRes = await fetch(`${API_BASE}/videos/${taskId}`, {
+        headers: { 'Authorization': `Bearer ${key}` }
+      });
+
+      if (!pollRes.ok) continue;
+      const pollData = await pollRes.json();
+
+      if (pollData.status === 'succeeded' || pollData.status === 'completed') {
+        const url = pollData.url || pollData.video_url || (pollData.output && pollData.output[0]);
+        showStatus('videoStatus', '✅ ویدیو آماده شد!', 'success');
+        document.getElementById('videoOutput').innerHTML =
+          `<video controls autoplay src="${url}"></video><br><a href="${url}" download style="color:#60a5fa;margin-top:10px;display:inline-block;">⬇️ دانلود</a>`;
+        btn.disabled = false;
+        return;
+      }
+
+      if (pollData.status === 'failed') {
+        throw new Error(pollData.error || 'تسک شکست خورد');
+      }
+
+      showStatus('videoStatus', `⏳ در حال پردازش... (${attempts * 5} ثانیه)`, 'info');
+    }
+
+    throw new Error('تایم‌اوت: ویدیو توی ۱۰ دقیقه آماده نشد');
+
+  } catch (e) {
+    showStatus('videoStatus', '❌ ' + e.message, 'error');
+    btn.disabled = false;
+  }
+}
+
+// ===== Generate Image =====
+async function generateImage() {
+  const key = getKey();
+  if (!key) return alert('اول API Key رو ذخیره کن');
+
+  const prompt = document.getElementById('imagePrompt').value.trim();
+  if (!prompt) return alert('پرامپت رو وارد کن');
+
+  const size = document.getElementById('imageSize').value;
+  const btn = document.getElementById('imageBtn');
+  btn.disabled = true;
+  showStatus('imageStatus', '⏳ در حال ساخت عکس...', 'info');
+  document.getElementById('imageOutput').innerHTML = '';
+
+  try {
+    const res = await fetch(`${API_BASE}/images`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ prompt, size })
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`HTTP ${res.status}: ${err}`);
+    }
+
+    const data = await res.json();
+    const url = data.url || data.image_url || (data.data && data.data[0] && data.data[0].url);
+
+    if (!url) throw new Error('URL عکس دریافت نشد');
+
+    showStatus('imageStatus', '✅ عکس آماده شد!', 'success');
+    document.getElementById('imageOutput').innerHTML =
+      `<img src="${url}" alt="generated" /><br><a href="${url}" download style="color:#60a5fa;margin-top:10px;display:inline-block;">⬇️ دانلود</a>`;
+
+  } catch (e) {
+    showStatus('imageStatus', '❌ ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
+
