@@ -301,7 +301,7 @@ async function generateImage() {
   document.getElementById('imageOutput').innerHTML = '';
 
   try {
-    const res = await fetch(`${API_BASE}/images`, {
+    const res = await fetch(`${API_BASE}/images/generations`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${key}`,
