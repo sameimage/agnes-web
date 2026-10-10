@@ -307,7 +307,7 @@ async function generateImage() {
         'Authorization': `Bearer ${key}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ prompt, size })
+      body: JSON.stringify({ model: 'agnes-image-2.1-flash', prompt, size })
     });
 
     if (!res.ok) {
