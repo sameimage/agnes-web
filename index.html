@@ -1,24 +1,9 @@
-<html lang="fa" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Agnes Video Generator — Free AI Video & Image</title>
-<style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    font-family: 'Segoe UI', Tahoma, sans-serif;
-    background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
-    color: #fff;
-    min-height: 100vh;
-    padding: 20px;
-  }
-  .container { max-width: 800px; margin: 0 auto; }
 <!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WhySame — ویرایش عکس با هوش مصنوعی</title>
+<title>WhySame — AI Image Studio</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -28,6 +13,7 @@
     min-height: 100vh;
     overflow-x: hidden;
     position: relative;
+    transition: direction 0.3s;
   }
   body::before {
     content: '';
@@ -57,6 +43,7 @@
     background: rgba(10,10,21,0.8);
     backdrop-filter: blur(20px);
     border-bottom: 1px solid rgba(255,255,255,0.05);
+    gap: 12px;
   }
   .topbar-logo {
     font-weight: 800;
@@ -77,19 +64,39 @@
   }
   @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
 
+  .topbar-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+  .lang-btn {
+    background: rgba(96,165,250,0.15);
+    border: 1px solid rgba(96,165,250,0.4);
+    color: #60a5fa;
+    padding: 8px 16px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.85rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .lang-btn:hover { background: rgba(96,165,250,0.25); transform: translateY(-1px); }
   .api-btn {
     background: rgba(192,132,252,0.15);
     border: 1px solid rgba(192,132,252,0.4);
     color: #c084fc;
-    padding: 9px 20px;
+    padding: 8px 16px;
     border-radius: 50px;
     cursor: pointer;
     font-family: inherit;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     transition: all 0.2s;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
   }
   .api-btn:hover { background: rgba(192,132,252,0.25); transform: translateY(-1px); }
   .api-btn.saved { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.15); }
@@ -99,7 +106,7 @@
     position: relative;
     z-index: 10;
     text-align: center;
-    padding: 50px 20px 30px;
+    padding: 45px 20px 25px;
   }
   .logo {
     font-size: 3.5rem;
@@ -108,26 +115,64 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     letter-spacing: -2px;
-    margin-bottom: 12px;
+    margin-bottom: 10px;
     line-height: 1;
   }
   .logo span {
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.85rem;
     font-weight: 400;
     letter-spacing: 4px;
     color: #666;
     -webkit-text-fill-color: #666;
-    margin-top: 8px;
+    margin-top: 10px;
   }
   .tagline {
     color: #888;
-    font-size: 1rem;
-    max-width: 500px;
+    font-size: 0.95rem;
+    max-width: 520px;
     margin: 0 auto;
     line-height: 1.7;
   }
   .tagline strong { color: #c084fc; }
+
+  /* تب‌ها */
+  .tabs-wrap {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+  .tabs {
+    display: flex;
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 16px;
+    padding: 6px;
+    gap: 6px;
+  }
+  .tab {
+    flex: 1;
+    padding: 14px;
+    text-align: center;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.25s;
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
+  .tab:hover { color: #ccc; background: rgba(255,255,255,0.03); }
+  .tab.active {
+    background: linear-gradient(135deg, #ff6b9d, #c084fc);
+    color: #fff;
+    box-shadow: 0 8px 20px rgba(192,132,252,0.3);
+  }
 
   /* مودال API Key */
   .modal-overlay {
@@ -186,7 +231,7 @@
   .btn-secondary { background: rgba(255,255,255,0.08); color: #ccc; }
   .modal a { color: #60a5fa; text-decoration: none; }
   .modal a:hover { text-decoration: underline; }
-  .modal .status-badge {
+  .status-badge {
     display: inline-block;
     padding: 4px 10px;
     border-radius: 50px;
@@ -214,6 +259,7 @@
     margin-bottom: 20px;
     backdrop-filter: blur(10px);
     transition: border-color 0.3s;
+    animation: fadeIn 0.4s;
   }
   .card:hover { border-color: rgba(192,132,252,0.3); }
   .card-title {
@@ -275,7 +321,7 @@
   .remove-btn {
     position: absolute;
     top: 8px;
-    right: 8px;
+    inset-inline-end: 8px;
     width: 34px;
     height: 34px;
     border-radius: 50%;
@@ -403,7 +449,6 @@
   }
   .output .actions a:hover, .output .actions button:hover { transform: scale(1.05); }
 
-  /* اسپینر */
   .spinner {
     display: inline-block;
     width: 14px;
@@ -413,7 +458,7 @@
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
     vertical-align: middle;
-    margin-left: 8px;
+    margin-inline-start: 8px;
   }
   @keyframes spin { to { transform: rotate(360deg); } }
 
@@ -422,7 +467,7 @@
     position: relative;
     z-index: 10;
     text-align: center;
-    padding: 30px 20px;
+    padding: 40px 20px;
     color: #555;
     font-size: 0.85rem;
     border-top: 1px solid rgba(255,255,255,0.05);
@@ -431,6 +476,29 @@
   }
   .footer a { color: #c084fc; text-decoration: none; }
   .footer a:hover { text-decoration: underline; }
+  .telegram-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 14px;
+    padding: 10px 22px;
+    background: linear-gradient(135deg, #229ED9, #1c7fb0);
+    border-radius: 50px;
+    color: #fff !important;
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    transition: all 0.25s;
+    box-shadow: 0 8px 25px rgba(34,158,217,0.35);
+  }
+  .telegram-badge:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 35px rgba(34,158,217,0.5);
+    text-decoration: none !important;
+  }
+  .telegram-badge svg { width: 20px; height: 20px; fill: #fff; }
+
+  .hidden { display: none !important; }
 
   @media (max-width: 600px) {
     .logo { font-size: 2.4rem; }
@@ -438,6 +506,9 @@
     .container { padding: 20px 14px 40px; }
     .card { padding: 20px; }
     .header { padding: 30px 20px 20px; }
+    .topbar { padding: 12px 14px; }
+    .tab { font-size: 0.85rem; padding: 12px 8px; }
+    .lang-btn span, .api-btn span { display: none; }
   }
 </style>
 </head>
@@ -449,38 +520,51 @@
     <span class="dot"></span>
     WhySame
   </div>
-  <button class="api-btn" id="apiBtn" onclick="openModal()">
-    🔑 <span id="apiBtnText">تنظیم API Key</span>
-  </button>
+  <div class="topbar-actions">
+    <button class="lang-btn" id="langBtn" onclick="toggleLang()">
+      🌐 <span id="langBtnText">EN</span>
+    </button>
+    <button class="api-btn" id="apiBtn" onclick="openModal()">
+      🔑 <span id="apiBtnText" data-i18n="apiBtn">تنظیم API Key</span>
+    </button>
+  </div>
 </div>
 
 <!-- هدر -->
 <div class="header">
   <div class="logo">
     WhySame
-    <span>AI IMAGE STUDIO</span>
+    <span data-i18n="headerSub">AI IMAGE STUDIO</span>
   </div>
-  <p class="tagline">
-    عکست رو آپلود کن، بگو چی می‌خوای، و <strong>هوش مصنوعی</strong> برات می‌سازد.
-    کاملاً رایگان — فقط با کلید API خودت.
+  <p class="tagline" data-i18n="tagline">
+    عکست رو بساز یا ویرایش کن — <strong>هوش مصنوعی</strong> برات می‌سازد. کاملاً رایگان، فقط با کلید API خودت.
   </p>
+</div>
+
+<!-- تب‌ها -->
+<div class="tabs-wrap">
+  <div class="tabs">
+    <div class="tab active" id="tabT2I" onclick="switchTab('t2i')">
+      ✨ <span data-i18n="tabT2I">متن به عکس</span>
+    </div>
+    <div class="tab" id="tabI2I" onclick="switchTab('i2i')">
+      🖼️ <span data-i18n="tabI2I">عکس به عکس</span>
+    </div>
+  </div>
 </div>
 
 <!-- مودال API Key -->
 <div class="modal-overlay" id="modal">
   <div class="modal">
-    <h2>🔑 تنظیم API Key</h2>
+    <h2 data-i18n="modalTitle">🔑 تنظیم API Key</h2>
     <div id="keyStatus"></div>
-    <p>
-      برای استفاده، به یه API Key رایگان از Agnes AI نیاز داری.
-      کلید رو از
-      <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a>
-      بگیر. کلید فقط توی مرورگر خودت ذخیره می‌شه و به هیچ سروری فرستاده نمی‌شه.
+    <p data-i18n="modalDesc">
+      برای استفاده، به یه API Key رایگان از Agnes AI نیاز داری. کلید رو از platform.agnes-ai.com بگیر. کلید فقط توی مرورگر خودت ذخیره می‌شه و به هیچ سروری فرستاده نمی‌شه.
     </p>
     <input type="password" id="apiKeyInput" placeholder="sk-..." />
     <div class="modal-btns">
-      <button class="btn-secondary" onclick="closeModal()">انصراف</button>
-      <button class="btn-primary" onclick="saveKey()">ذخیره</button>
+      <button class="btn-secondary" onclick="closeModal()" data-i18n="cancel">انصراف</button>
+      <button class="btn-primary" onclick="saveKey()" data-i18n="save">ذخیره</button>
     </div>
   </div>
 </div>
@@ -488,109 +572,259 @@
 <!-- محتوا -->
 <div class="container">
 
-  <!-- آپلود عکس -->
-  <div class="card">
-    <div class="card-title">
-      <span class="num">۱</span>
-      عکس مبدأ رو آپلود کن
-      <span style="color:#666;font-size:0.85rem;font-weight:400;">(اختیاری)</span>
-    </div>
-    <div class="drop-zone" id="dropZone">
-      <span class="icon">📁</span>
-      <div class="text">عکس رو بکش و اینجا رها کن، یا کلیک کن</div>
-      <div class="hint">فرمت‌های مجاز: JPG, PNG, WEBP</div>
-      <input type="file" id="fileInput" accept="image/*" />
-    </div>
-    <div class="preview-wrap" id="previewWrap">
-      <button class="remove-btn" onclick="removeImage()" title="حذف">×</button>
-      <img id="previewImg" src="" alt="preview" />
+  <!-- تب متن به عکس -->
+  <div id="panelT2I">
+    <div class="card">
+      <div class="card-title">
+        <span class="num">۱</span>
+        <span data-i18n="promptTitle">پرامپت رو بنویس</span>
+      </div>
+      <textarea id="promptT2I" data-i18n-placeholder="promptPlaceholderT2I" placeholder="مثلاً: یه گربه شبیه شیبا اینو زیر درخت شکوفه گیلاس که لبخند می‌زنه، نورپردازی گرم"></textarea>
+      <div class="options">
+        <div class="option-group">
+          <label data-i18n="sizeLabel">اندازه عکس</label>
+          <select id="sizeT2I">
+            <option value="1024x1024">1:1 مربع</option>
+            <option value="1024x768">4:3 افقی</option>
+            <option value="768x1024">3:4 عمودی</option>
+            <option value="1312x736">16:9 افقی</option>
+            <option value="736x1312">9:16 عمودی</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label data-i18n="modelLabel">مدل</label>
+          <select id="modelT2I">
+            <option value="agnes-image-2.5-flash">2.5 Flash</option>
+            <option value="agnes-image-2.1-flash">2.1 Flash</option>
+            <option value="agnes-image-2.0-flash">2.0 Flash</option>
+          </select>
+        </div>
+      </div>
+      <button class="generate-btn" id="btnT2I" onclick="generateT2I()">
+        🎨 <span data-i18n="generateBtn">ساخت عکس</span>
+      </button>
+      <div class="status" id="statusT2I"></div>
+      <div class="output" id="outputT2I"></div>
     </div>
   </div>
 
-  <!-- پرامپت -->
-  <div class="card">
-    <div class="card-title">
-      <span class="num">۲</span>
-      تغییری که می‌خوای رو بنویس
-    </div>
-    <textarea id="prompt" placeholder="مثلاً: این عکس رو به سبک سایبرپانک شبانه با نورهای نئون تبدیل کن، ترکیب اصلی حفظ بشه"></textarea>
-    <div class="options">
-      <div class="option-group">
-        <label>اندازه عکس</label>
-        <select id="imageSize">
-          <option value="1024x1024">1:1 مربع</option>
-          <option value="1024x768">4:3 افقی</option>
-          <option value="768x1024">3:4 عمودی</option>
-          <option value="1312x736">16:9 افقی</option>
-          <option value="736x1312">9:16 عمودی</option>
-        </select>
+  <!-- تب عکس به عکس -->
+  <div id="panelI2I" class="hidden">
+    <div class="card">
+      <div class="card-title">
+        <span class="num">۱</span>
+        <span data-i18n="uploadTitle">عکس مبدأ رو آپلود کن</span>
       </div>
-      <div class="option-group">
-        <label>مدل</label>
-        <select id="imageModel">
-          <option value="agnes-image-2.5-flash">2.5 Flash (جدیدترین)</option>
-          <option value="agnes-image-2.1-flash">2.1 Flash</option>
-          <option value="agnes-image-2.0-flash">2.0 Flash</option>
-        </select>
+      <div class="drop-zone" id="dropZone">
+        <span class="icon">📁</span>
+        <div class="text" data-i18n="dropText">عکس رو بکش و اینجا رها کن، یا کلیک کن</div>
+        <div class="hint" data-i18n="dropHint">فرمت‌های مجاز: JPG, PNG, WEBP</div>
+        <input type="file" id="fileInput" accept="image/*" />
+      </div>
+      <div class="preview-wrap" id="previewWrap">
+        <button class="remove-btn" onclick="removeImage()" title="حذف">×</button>
+        <img id="previewImg" src="" alt="preview" />
       </div>
     </div>
-    <button class="generate-btn" id="generateBtn" onclick="generateImage()">
-      🎨 ساخت عکس
-    </button>
-    <div class="status" id="status"></div>
-    <div class="output" id="output"></div>
+
+    <div class="card">
+      <div class="card-title">
+        <span class="num">۲</span>
+        <span data-i18n="editTitle">تغییری که می‌خوای رو بنویس</span>
+      </div>
+      <textarea id="promptI2I" data-i18n-placeholder="promptPlaceholderI2I" placeholder="مثلاً: این عکس رو به سبک سایبرپانک شبانه با نورهای نئون تبدیل کن، ترکیب اصلی حفظ بشه"></textarea>
+      <div class="options">
+        <div class="option-group">
+          <label data-i18n="sizeLabel">اندازه عکس</label>
+          <select id="sizeI2I">
+            <option value="1024x1024">1:1 مربع</option>
+            <option value="1024x768">4:3 افقی</option>
+            <option value="768x1024">3:4 عمودی</option>
+            <option value="1312x736">16:9 افقی</option>
+            <option value="736x1312">9:16 عمودی</option>
+          </select>
+        </div>
+        <div class="option-group">
+          <label data-i18n="modelLabel">مدل</label>
+          <select id="modelI2I">
+            <option value="agnes-image-2.5-flash">2.5 Flash</option>
+            <option value="agnes-image-2.1-flash">2.1 Flash</option>
+            <option value="agnes-image-2.0-flash">2.0 Flash</option>
+          </select>
+        </div>
+      </div>
+      <button class="generate-btn" id="btnI2I" onclick="generateI2I()">
+        🖼️ <span data-i18n="editBtn">ویرایش عکس</span>
+      </button>
+      <div class="status" id="statusI2I"></div>
+      <div class="output" id="outputI2I"></div>
+    </div>
   </div>
 
 </div>
 
 <!-- فوتر -->
 <div class="footer">
-  ساخته شده با ❤️ برای <a href="https://whysame.dev" target="_blank">WhySame</a>
-  · قدرت گرفته از <a href="https://platform.agnes-ai.com" target="_blank">Agnes AI</a>
+  <div data-i18n="footerText">ساخته شده با ❤️ توسط WhySame</div>
+  <a href="https://t.me/vvowvv" target="_blank" class="telegram-badge">
+    <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+      <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+    </svg>
+    <span data-i18n="telegramText">کانال تلگرام ما</span>
+    <span style="opacity:0.8;">@vvowvv</span>
+  </a>
 </div>
 
 <script>
 const API_BASE = 'https://apihub.agnes-ai.com/v1';
 
-// ===== API Key Management =====
+// ===== i18n =====
+const translations = {
+  fa: {
+    apiBtn: 'تنظیم API Key',
+    apiBtnSaved: 'کلید تنظیم شد',
+    headerSub: 'استودیو عکس هوش مصنوعی',
+    tagline: 'عکست رو بساز یا ویرایش کن — <strong>هوش مصنوعی</strong> برات می‌سازد. کاملاً رایگان، فقط با کلید API خودت.',
+    tabT2I: 'متن به عکس',
+    tabI2I: 'عکس به عکس',
+    modalTitle: '🔑 تنظیم API Key',
+    modalDesc: 'برای استفاده، به یه API Key رایگان از Agnes AI نیاز داری. کلید رو از platform.agnes-ai.com بگیر. کلید فقط توی مرورگر خودت ذخیره می‌شه و به هیچ سروری فرستاده نمی‌شه.',
+    cancel: 'انصراف',
+    save: 'ذخیره',
+    promptTitle: 'پرامپت رو بنویس',
+    promptPlaceholderT2I: 'مثلاً: یه گربه شبیه شیبا اینو زیر درخت شکوفه گیلاس که لبخند می‌زنه، نورپردازی گرم',
+    promptPlaceholderI2I: 'مثلاً: این عکس رو به سبک سایبرپانک شبانه با نورهای نئون تبدیل کن، ترکیب اصلی حفظ بشه',
+    sizeLabel: 'اندازه عکس',
+    modelLabel: 'مدل',
+    generateBtn: 'ساخت عکس',
+    editBtn: 'ویرایش عکس',
+    uploadTitle: 'عکس مبدأ رو آپلود کن',
+    dropText: 'عکس رو بکش و اینجا رها کن، یا کلیک کن',
+    dropHint: 'فرمت‌های مجاز: JPG, PNG, WEBP',
+    editTitle: 'تغییری که می‌خوای رو بنویس',
+    footerText: 'ساخته شده با ❤️ توسط WhySame',
+    telegramText: 'کانال تلگرام ما',
+    statusLoading: '⏳ در حال ساخت عکس...',
+    statusSuccess: '✅ عکس آماده شد!',
+    statusError: '❌ خطا: ',
+    download: '⬇️ دانلود',
+    copyLink: '🔗 کپی لینک',
+    needKey: 'اول باید API Key رو تنظیم کنی. بریم به پنل تنظیمات؟',
+    needPrompt: 'پرامپت رو وارد کن',
+    keySaved: 'کلید ذخیره شد',
+    linkCopied: 'لینک کپی شد!',
+    placeholderSize: 'اندازه'
+  },
+  en: {
+    apiBtn: 'Set API Key',
+    apiBtnSaved: 'Key Saved',
+    headerSub: 'AI IMAGE STUDIO',
+    tagline: 'Create or edit your images — <strong>AI</strong> does the magic. Completely free, just use your own API key.',
+    tabT2I: 'Text to Image',
+    tabI2I: 'Image to Image',
+    modalTitle: '🔑 Set API Key',
+    modalDesc: 'To use this site, you need a free API Key from Agnes AI. Get it from platform.agnes-ai.com. The key is stored only in your browser and is never sent to any server.',
+    cancel: 'Cancel',
+    save: 'Save',
+    promptTitle: 'Write your prompt',
+    promptPlaceholderT2I: 'e.g., A Shiba Inu smiling under a cherry blossom tree, warm lighting',
+    promptPlaceholderI2I: 'e.g., Transform this into a cyberpunk night scene with neon lights, preserving the original composition',
+    sizeLabel: 'Image Size',
+    modelLabel: 'Model',
+    generateBtn: 'Generate Image',
+    editBtn: 'Edit Image',
+    uploadTitle: 'Upload source image',
+    dropText: 'Drag and drop, or click to select',
+    dropHint: 'Allowed formats: JPG, PNG, WEBP',
+    editTitle: 'Describe your edit',
+    footerText: 'Made with ❤️ by WhySame',
+    telegramText: 'Our Telegram',
+    statusLoading: '⏳ Generating image...',
+    statusSuccess: '✅ Image ready!',
+    statusError: '❌ Error: ',
+    download: '⬇️ Download',
+    copyLink: '🔗 Copy link',
+    needKey: 'First, set your API Key. Open settings?',
+    needPrompt: 'Please enter a prompt',
+    keySaved: 'Key saved',
+    linkCopied: 'Link copied!',
+    placeholderSize: 'Size'
+  }
+};
+
+let currentLang = 'fa';
+
+function toggleLang() {
+  currentLang = currentLang === 'fa' ? 'en' : 'fa';
+  applyLang();
+}
+function applyLang() {
+  const t = translations[currentLang];
+  document.documentElement.lang = currentLang;
+  document.documentElement.dir = currentLang === 'fa' ? 'rtl' : 'ltr';
+  document.body.style.direction = currentLang === 'fa' ? 'rtl' : 'ltr';
+  document.getElementById('langBtnText').textContent = currentLang === 'fa' ? 'EN' : 'فا';
+
+  // Apply translations
+  document.querySelectorAll('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (t[key]) el.innerHTML = t[key];
+  });
+  document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+    const key = el.getAttribute('data-i18n-placeholder');
+    if (t[key]) el.placeholder = t[key];
+  });
+
+  // API button text
+  updateApiBtn();
+}
+
+// ===== API Key =====
 function openModal() {
   const modal = document.getElementById('modal');
   const input = document.getElementById('apiKeyInput');
-  const currentKey = getKey();
-  input.value = currentKey;
+  input.value = getKey();
   updateKeyStatus();
   modal.classList.add('open');
 }
-function closeModal() {
-  document.getElementById('modal').classList.remove('open');
-}
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
 function updateKeyStatus() {
+  const t = translations[currentLang];
   const statusEl = document.getElementById('keyStatus');
   if (getKey()) {
-    statusEl.innerHTML = '<span class="status-badge ok">✅ کلید ذخیره شده</span>';
+    statusEl.innerHTML = `<span class="status-badge ok">✅ ${currentLang === 'fa' ? 'کلید ذخیره شده' : 'Key saved'}</span>`;
   } else {
-    statusEl.innerHTML = '<span class="status-badge no">⚠️ کلیدی ذخیره نشده</span>';
+    statusEl.innerHTML = `<span class="status-badge no">⚠️ ${currentLang === 'fa' ? 'کلیدی ذخیره نشده' : 'No key saved'}</span>`;
   }
 }
 function saveKey() {
   const key = document.getElementById('apiKeyInput').value.trim();
-  if (!key) return alert('کلید رو وارد کن');
+  if (!key) return alert(currentLang === 'fa' ? 'کلید رو وارد کن' : 'Please enter a key');
   localStorage.setItem('whysame_api_key', key);
   updateKeyStatus();
   updateApiBtn();
-  setTimeout(closeModal, 500);
+  setTimeout(closeModal, 400);
 }
 function getKey() { return localStorage.getItem('whysame_api_key') || ''; }
 function updateApiBtn() {
+  const t = translations[currentLang];
   const btn = document.getElementById('apiBtn');
   const text = document.getElementById('apiBtnText');
   if (getKey()) {
     btn.classList.add('saved');
-    text.textContent = 'کلید تنظیم شد';
+    text.textContent = t.apiBtnSaved;
   } else {
     btn.classList.remove('saved');
-    text.textContent = 'تنظیم API Key';
+    text.textContent = t.apiBtn;
   }
+}
+
+// ===== Tabs =====
+function switchTab(tab) {
+  document.getElementById('tabT2I').classList.toggle('active', tab === 't2i');
+  document.getElementById('tabI2I').classList.toggle('active', tab === 'i2i');
+  document.getElementById('panelT2I').classList.toggle('hidden', tab !== 't2i');
+  document.getElementById('panelI2I').classList.toggle('hidden', tab !== 'i2i');
 }
 
 // ===== Upload =====
@@ -598,10 +832,7 @@ const dropZone = document.getElementById('dropZone');
 const fileInput = document.getElementById('fileInput');
 
 dropZone.addEventListener('click', () => fileInput.click());
-dropZone.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropZone.classList.add('dragover');
-});
+dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
 dropZone.addEventListener('drop', (e) => {
   e.preventDefault();
@@ -616,7 +847,6 @@ fileInput.addEventListener('change', (e) => {
   const file = e.target.files[0];
   if (file) showPreview(file);
 });
-
 function showPreview(file) {
   const reader = new FileReader();
   reader.onload = (ev) => {
@@ -632,13 +862,10 @@ function removeImage() {
 }
 
 // ===== Status =====
-function showStatus(msg, type) {
-  const el = document.getElementById('status');
+function showStatus(id, msg, type) {
+  const el = document.getElementById(id);
   el.innerHTML = msg;
   el.className = 'status show ' + type;
-}
-function hideStatus() {
-  document.getElementById('status').className = 'status';
 }
 
 // ===== File to Data URI =====
@@ -651,42 +878,47 @@ function fileToDataURI(file) {
   });
 }
 
-// ===== Generate =====
-async function generateImage() {
+// ===== Build Output =====
+function renderOutput(outputId, url) {
+  const t = translations[currentLang];
+  const el = document.getElementById(outputId);
+  el.innerHTML = `
+    <img src="${url}" alt="generated" />
+    <div class="actions">
+      <a href="${url}" download target="_blank">${t.download}</a>
+      <button onclick="copyUrl('${url}')">${t.copyLink}</button>
+    </div>
+  `;
+  el.classList.add('show');
+}
+
+function copyUrl(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    alert(translations[currentLang].linkCopied);
+  });
+}
+
+// ===== Generate T2I =====
+async function generateT2I() {
+  const t = translations[currentLang];
   const key = getKey();
-  if (!key) {
-    if (confirm('اول باید API Key رو تنظیم کنی. بریم به پنل تنظیمات؟')) {
-      openModal();
-    }
-    return;
-  }
+  if (!key) { if (confirm(t.needKey)) openModal(); return; }
 
-  const prompt = document.getElementById('prompt').value.trim();
-  if (!prompt) return alert('پرامپت رو وارد کن');
+  const prompt = document.getElementById('promptT2I').value.trim();
+  if (!prompt) return alert(t.needPrompt);
 
-  const size = document.getElementById('imageSize').value;
-  const model = document.getElementById('imageModel').value;
-  const file = fileInput.files[0];
-
-  const btn = document.getElementById('generateBtn');
+  const size = document.getElementById('sizeT2I').value;
+  const model = document.getElementById('modelT2I').value;
+  const btn = document.getElementById('btnT2I');
   btn.disabled = true;
-  showStatus('⏳ در حال ساخت عکس... <span class="spinner"></span>', 'info');
-  document.getElementById('output').classList.remove('show');
-  document.getElementById('output').innerHTML = '';
+  showStatus('statusT2I', t.statusLoading + ' <span class="spinner"></span>', 'info');
+  document.getElementById('outputT2I').classList.remove('show');
 
   try {
     const body = {
-      model: model,
-      prompt: prompt,
-      size: size,
+      model, prompt, size,
       extra_body: { response_format: 'url' }
     };
-
-    if (file) {
-      const dataUri = await fileToDataURI(file);
-      body.extra_body.image = [dataUri];
-    }
-
     const res = await fetch(`${API_BASE}/images/generations`, {
       method: 'POST',
       headers: {
@@ -695,364 +927,72 @@ async function generateImage() {
       },
       body: JSON.stringify(body)
     });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`HTTP ${res.status}: ${err}`);
-    }
-
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
     const data = await res.json();
     const url = data.data && data.data[0] && data.data[0].url;
-
-    if (!url) throw new Error('URL عکس دریافت نشد');
-
-    showStatus('✅ عکس آماده شد!', 'success');
-    const outputEl = document.getElementById('output');
-    outputEl.innerHTML = `
-      <img src="${url}" alt="generated" />
-      <div class="actions">
-        <a href="${url}" download target="_blank">⬇️ دانلود</a>
-        <button onclick="copyUrl('${url}')">🔗 کپی لینک</button>
-      </div>
-    `;
-    outputEl.classList.add('show');
-
+    if (!url) throw new Error('No image URL');
+    showStatus('statusT2I', t.statusSuccess, 'success');
+    renderOutput('outputT2I', url);
   } catch (e) {
-    showStatus('❌ ' + e.message, 'error');
+    showStatus('statusT2I', t.statusError + e.message, 'error');
   } finally {
     btn.disabled = false;
   }
 }
 
-function copyUrl(url) {
-  navigator.clipboard.writeText(url).then(() => {
-    alert('لینک کپی شد!');
-  });
-}
-
-// ===== Init =====
-window.addEventListener('DOMContentLoaded', () => {
-  updateApiBtn();
-  updateKeyStatus();
-});
-</script>
-</body>
-</html>    text-align: center;
-    font-size: 2rem;
-    margin-bottom: 10px;
-    background: linear-gradient(90deg, #ff6b9d, #c084fc, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-  .subtitle { text-align: center; color: #aaa; margin-bottom: 30px; font-size: 0.9rem; }
-  .card {
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 16px;
-    padding: 24px;
-    margin-bottom: 20px;
-    backdrop-filter: blur(10px);
-  }
-  .card h2 { font-size: 1.1rem; margin-bottom: 16px; color: #c084fc; }
-  input, textarea, select {
-    width: 100%;
-    padding: 12px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.15);
-    border-radius: 8px;
-    color: #fff;
-    font-family: inherit;
-    font-size: 0.95rem;
-    margin-bottom: 12px;
-  }
-  textarea { min-height: 100px; resize: vertical; }
-  input:focus, textarea:focus, select:focus {
-    outline: none;
-    border-color: #c084fc;
-  }
-  .row { display: flex; gap: 10px; }
-  .row > * { flex: 1; }
-  button {
-    background: linear-gradient(90deg, #ff6b9d, #c084fc);
-    border: none;
-    color: white;
-    padding: 12px 24px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-family: inherit;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: transform 0.2s, opacity 0.2s;
-    width: 100%;
-  }
-  button:hover:not(:disabled) { transform: scale(1.02); }
-  button:disabled { opacity: 0.5; cursor: not-allowed; }
-  button.secondary {
-    background: rgba(255,255,255,0.1);
-    font-weight: normal;
-  }
-  .status {
-    padding: 12px;
-    border-radius: 8px;
-    margin-top: 12px;
-    font-size: 0.9rem;
-    display: none;
-  }
-  .status.info { background: rgba(96,165,250,0.2); border: 1px solid #60a5fa; display: block; }
-  .status.error { background: rgba(239,68,68,0.2); border: 1px solid #ef4444; display: block; }
-  .status.success { background: rgba(34,197,94,0.2); border: 1px solid #22c55e; display: block; }
-  .output { margin-top: 16px; text-align: center; }
-  .output img, .output video {
-    max-width: 100%;
-    border-radius: 12px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-  }
-  .key-hint { font-size: 0.8rem; color: #888; margin-top: 8px; }
-  .key-hint a { color: #60a5fa; }
-  .tabs { display: flex; gap: 8px; margin-bottom: 20px; }
-  .tab {
-    flex: 1;
-    padding: 10px;
-    text-align: center;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid rgba(255,255,255,0.1);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.2s;
-  }
-  .tab.active {
-    background: linear-gradient(90deg, #ff6b9d, #c084fc);
-    border-color: transparent;
-  }
-</style>
-</head>
-<body>
-<div class="container">
-  <h1>🎬 Agnes Video Generator</h1>
-  <p class="subtitle">Free AI video & image generator — built on Agnes AI</p>
-
-  <!-- API Key -->
-  <div class="card">
-    <h2>🔑 API Key</h2>
-    <input type="password" id="apiKey" placeholder="sk-..." />
-    <div class="row">
-      <button onclick="saveKey()">ذخیره</button>
-      <button class="secondary" onclick="clearKey()">پاک کردن</button>
-    </div>
-    <p class="key-hint">کلید رو از <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a> بگیر. فقط توی مرورگر خودت ذخیره میشه.</p>
-  </div>
-
-  <!-- Tabs -->
-  <div class="tabs">
-    <div class="tab active" onclick="switchTab('video')">🎥 ویدیو</div>
-    <div class="tab" onclick="switchTab('image')">🖼️ عکس</div>
-  </div>
-
-  <!-- Video Panel -->
-  <div class="card" id="videoPanel">
-    <h2>🎥 ساخت ویدیو</h2>
-    <textarea id="videoPrompt" placeholder="Describe the video you want, e.g. A girl swimming in a pool, cinematic, slow motion..."></textarea>
-    <div class="row">
-      <select id="videoAspect">
-        <option value="16:9">16:9 افقی</option>
-        <option value="9:16">9:16 عمودی</option>
-        <option value="1:1">1:1 مربع</option>
-      </select>
-      <select id="videoDuration">
-        <option value="5">۵ ثانیه</option>
-        <option value="10">۱۰ ثانیه</option>
-        <option value="12" selected>۱۲ ثانیه</option>
-        <option value="20">۲۰ ثانیه</option>
-      </select>
-    </div>
-    <button id="videoBtn" onclick="generateVideo()">🎬 ساخت ویدیو</button>
-    <div class="status" id="videoStatus"></div>
-    <div class="output" id="videoOutput"></div>
-  </div>
-
-  <!-- Image Panel -->
-  <div class="card" id="imagePanel" style="display:none;">
-    <h2>🖼️ ساخت عکس</h2>
-    <textarea id="imagePrompt" placeholder="Describe the image you want, e.g. A Shiba Inu smiling under a cherry blossom tree..."></textarea>
-    <select id="imageSize">
-      <option value="1024x1024">1:1 مربع</option>
-      <option value="1344x768">16:9 افقی</option>
-      <option value="768x1344">9:16 عمودی</option>
-    </select>
-    <button id="imageBtn" onclick="generateImage()">🖼️ ساخت عکس</button>
-    <div class="status" id="imageStatus"></div>
-    <div class="output" id="imageOutput"></div>
-  </div>
-</div>
-
-<script>
-const API_BASE = 'https://apihub.agnes-ai.com/v1'; // آدرس API — اگه فرق داره تغییر بده
-
-// ===== API Key Management =====
-function saveKey() {
-  const key = document.getElementById('apiKey').value.trim();
-  if (!key) return alert('کلید رو وارد کن');
-  localStorage.setItem('agnes_api_key', key);
-  showStatus('videoStatus', '✅ کلید ذخیره شد', 'success');
-  setTimeout(() => hideStatus('videoStatus'), 2000);
-}
-function clearKey() {
-  localStorage.removeItem('agnes_api_key');
-  document.getElementById('apiKey').value = '';
-  alert('کلید پاک شد');
-}
-function getKey() {
-  return localStorage.getItem('agnes_api_key') || '';
-}
-window.addEventListener('DOMContentLoaded', () => {
-  const k = getKey();
-  if (k) document.getElementById('apiKey').value = k;
-});
-
-// ===== Tabs =====
-function switchTab(tab) {
-  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-  event.target.classList.add('active');
-  document.getElementById('videoPanel').style.display = tab === 'video' ? 'block' : 'none';
-  document.getElementById('imagePanel').style.display = tab === 'image' ? 'block' : 'none';
-}
-
-// ===== Status Helpers =====
-function showStatus(id, msg, type) {
-  const el = document.getElementById(id);
-  el.textContent = msg;
-  el.className = 'status ' + type;
-}
-function hideStatus(id) {
-  document.getElementById(id).className = 'status';
-}
-
-// ===== Generate Video =====
-async function generateVideo() {
+// ===== Generate I2I =====
+async function generateI2I() {
+  const t = translations[currentLang];
   const key = getKey();
-  if (!key) return alert('اول API Key رو ذخیره کن');
+  if (!key) { if (confirm(t.needKey)) openModal(); return; }
 
-  const prompt = document.getElementById('videoPrompt').value.trim();
-  if (!prompt) return alert('پرامپت رو وارد کن');
+  const prompt = document.getElementById('promptI2I').value.trim();
+  if (!prompt) return alert(t.needPrompt);
 
-  const aspect = document.getElementById('videoAspect').value;
-  const duration = document.getElementById('videoDuration').value;
-
-  const btn = document.getElementById('videoBtn');
+  const size = document.getElementById('sizeI2I').value;
+  const model = document.getElementById('modelI2I').value;
+  const file = fileInput.files[0];
+  const btn = document.getElementById('btnI2I');
   btn.disabled = true;
-  showStatus('videoStatus', '⏳ در حال ساخت ویدیو... (ممکنه چند دقیقه طول بکشه)', 'info');
-  document.getElementById('videoOutput').innerHTML = '';
+  showStatus('statusI2I', t.statusLoading + ' <span class="spinner"></span>', 'info');
+  document.getElementById('outputI2I').classList.remove('show');
 
   try {
-    // مرحله ۱: ارسال درخواست
-    const createRes = await fetch(`${API_BASE}/videos`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        prompt: prompt,
-        aspect_ratio: aspect,
-        duration: parseInt(duration)
-      })
-    });
-
-    if (!createRes.ok) {
-      const err = await createRes.text();
-      throw new Error(`HTTP ${createRes.status}: ${err}`);
+    const body = {
+      model, prompt, size,
+      extra_body: { response_format: 'url' }
+    };
+    if (file) {
+      const dataUri = await fileToDataURI(file);
+      body.extra_body.image = [dataUri];
     }
-
-    const createData = await createRes.json();
-    const taskId = createData.id || createData.task_id;
-
-    if (!taskId) throw new Error('Task ID دریافت نشد');
-
-    showStatus('videoStatus', `⏳ تسک ساخته شد (${taskId}). در حال پردازش...`, 'info');
-
-    // مرحله ۲: Polling
-    let attempts = 0;
-    const maxAttempts = 120; // ۱۰ دقیقه
-    while (attempts < maxAttempts) {
-      await new Promise(r => setTimeout(r, 5000));
-      attempts++;
-
-      const pollRes = await fetch(`${API_BASE}/videos/${taskId}`, {
-        headers: { 'Authorization': `Bearer ${key}` }
-      });
-
-      if (!pollRes.ok) continue;
-      const pollData = await pollRes.json();
-
-      if (pollData.status === 'succeeded' || pollData.status === 'completed') {
-        const url = pollData.url || pollData.video_url || (pollData.output && pollData.output[0]);
-        showStatus('videoStatus', '✅ ویدیو آماده شد!', 'success');
-        document.getElementById('videoOutput').innerHTML =
-          `<video controls autoplay src="${url}"></video><br><a href="${url}" download style="color:#60a5fa;margin-top:10px;display:inline-block;">⬇️ دانلود</a>`;
-        btn.disabled = false;
-        return;
-      }
-
-      if (pollData.status === 'failed') {
-        throw new Error(pollData.error || 'تسک شکست خورد');
-      }
-
-      showStatus('videoStatus', `⏳ در حال پردازش... (${attempts * 5} ثانیه)`, 'info');
-    }
-
-    throw new Error('تایم‌اوت: ویدیو توی ۱۰ دقیقه آماده نشد');
-
-  } catch (e) {
-    showStatus('videoStatus', '❌ ' + e.message, 'error');
-    btn.disabled = false;
-  }
-}
-
-// ===== Generate Image =====
-async function generateImage() {
-  const key = getKey();
-  if (!key) return alert('اول API Key رو ذخیره کن');
-
-  const prompt = document.getElementById('imagePrompt').value.trim();
-  if (!prompt) return alert('پرامپت رو وارد کن');
-
-  const size = document.getElementById('imageSize').value;
-  const btn = document.getElementById('imageBtn');
-  btn.disabled = true;
-  showStatus('imageStatus', '⏳ در حال ساخت عکس...', 'info');
-  document.getElementById('imageOutput').innerHTML = '';
-
-  try {
     const res = await fetch(`${API_BASE}/images/generations`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${key}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ model: 'agnes-image-2.1-flash', prompt, size })
+      body: JSON.stringify(body)
     });
-
-    if (!res.ok) {
-      const err = await res.text();
-      throw new Error(`HTTP ${res.status}: ${err}`);
-    }
-
+    if (!res.ok) throw new Error(`HTTP ${res.status}: ${await res.text()}`);
     const data = await res.json();
-    const url = data.url || data.image_url || (data.data && data.data[0] && data.data[0].url);
-
-    if (!url) throw new Error('URL عکس دریافت نشد');
-
-    showStatus('imageStatus', '✅ عکس آماده شد!', 'success');
-    document.getElementById('imageOutput').innerHTML =
-      `<img src="${url}" alt="generated" /><br><a href="${url}" download style="color:#60a5fa;margin-top:10px;display:inline-block;">⬇️ دانلود</a>`;
-
+    const url = data.data && data.data[0] && data.data[0].url;
+    if (!url) throw new Error('No image URL');
+    showStatus('statusI2I', t.statusSuccess, 'success');
+    renderOutput('outputI2I', url);
   } catch (e) {
-    showStatus('imageStatus', '❌ ' + e.message, 'error');
+    showStatus('statusI2I', t.statusError + e.message, 'error');
   } finally {
     btn.disabled = false;
   }
 }
+
+// ===== Init =====
+window.addEventListener('DOMContentLoaded', () => {
+  applyLang();
+  updateApiBtn();
+  updateKeyStatus();
+});
 </script>
 </body>
 </html>
-
