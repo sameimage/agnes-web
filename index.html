@@ -1,4 +1,3 @@
-<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
 <meta charset="UTF-8">
@@ -14,8 +13,731 @@
     padding: 20px;
   }
   .container { max-width: 800px; margin: 0 auto; }
-  h1 {
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhySame — ویرایش عکس با هوش مصنوعی</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', Tahoma, sans-serif;
+    background: #0a0a15;
+    color: #fff;
+    min-height: 100vh;
+    overflow-x: hidden;
+    position: relative;
+  }
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+      radial-gradient(circle at 20% 20%, rgba(192,132,252,0.15), transparent 50%),
+      radial-gradient(circle at 80% 80%, rgba(96,165,250,0.15), transparent 50%),
+      radial-gradient(circle at 50% 50%, rgba(255,107,157,0.08), transparent 50%);
+    animation: bgMove 15s ease-in-out infinite alternate;
+    z-index: 0;
+  }
+  @keyframes bgMove {
+    0% { transform: scale(1) translate(0, 0); }
+    100% { transform: scale(1.2) translate(-3%, -3%); }
+  }
+
+  /* نوار بالا */
+  .topbar {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px;
+    background: rgba(10,10,21,0.8);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+  .topbar-logo {
+    font-weight: 800;
+    font-size: 1.2rem;
+    background: linear-gradient(90deg, #ff6b9d, #c084fc, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .topbar-logo .dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: #22c55e;
+    box-shadow: 0 0 10px #22c55e;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+  .api-btn {
+    background: rgba(192,132,252,0.15);
+    border: 1px solid rgba(192,132,252,0.4);
+    color: #c084fc;
+    padding: 9px 20px;
+    border-radius: 50px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .api-btn:hover { background: rgba(192,132,252,0.25); transform: translateY(-1px); }
+  .api-btn.saved { border-color: #22c55e; color: #22c55e; background: rgba(34,197,94,0.15); }
+
+  /* هدر */
+  .header {
+    position: relative;
+    z-index: 10;
     text-align: center;
+    padding: 50px 20px 30px;
+  }
+  .logo {
+    font-size: 3.5rem;
+    font-weight: 900;
+    background: linear-gradient(90deg, #ff6b9d, #c084fc, #60a5fa);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    letter-spacing: -2px;
+    margin-bottom: 12px;
+    line-height: 1;
+  }
+  .logo span {
+    display: block;
+    font-size: 0.9rem;
+    font-weight: 400;
+    letter-spacing: 4px;
+    color: #666;
+    -webkit-text-fill-color: #666;
+    margin-top: 8px;
+  }
+  .tagline {
+    color: #888;
+    font-size: 1rem;
+    max-width: 500px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+  .tagline strong { color: #c084fc; }
+
+  /* مودال API Key */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(5px);
+    z-index: 100;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+  }
+  .modal-overlay.open { display: flex; animation: fadeIn 0.2s; }
+  @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+  .modal {
+    background: #15152a;
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 20px;
+    padding: 32px;
+    max-width: 480px;
+    width: 100%;
+    animation: slideUp 0.3s;
+  }
+  @keyframes slideUp { from { transform: translateY(30px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal h2 { font-size: 1.3rem; margin-bottom: 10px; }
+  .modal p { color: #888; font-size: 0.85rem; margin-bottom: 20px; line-height: 1.8; }
+  .modal input {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0,0,0,0.4);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    margin-bottom: 16px;
+    direction: ltr;
+    text-align: left;
+  }
+  .modal input:focus { outline: none; border-color: #c084fc; }
+  .modal-btns { display: flex; gap: 10px; }
+  .modal-btns button {
+    flex: 1;
+    padding: 13px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.95rem;
+    font-weight: 600;
+    transition: transform 0.2s;
+  }
+  .modal-btns button:hover { transform: scale(1.02); }
+  .btn-primary { background: linear-gradient(90deg, #ff6b9d, #c084fc); color: #fff; }
+  .btn-secondary { background: rgba(255,255,255,0.08); color: #ccc; }
+  .modal a { color: #60a5fa; text-decoration: none; }
+  .modal a:hover { text-decoration: underline; }
+  .modal .status-badge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.75rem;
+    margin-bottom: 16px;
+  }
+  .status-badge.ok { background: rgba(34,197,94,0.15); color: #22c55e; border: 1px solid rgba(34,197,94,0.3); }
+  .status-badge.no { background: rgba(239,68,68,0.15); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+
+  /* محتوا */
+  .container {
+    position: relative;
+    z-index: 10;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px 20px 60px;
+  }
+
+  /* کارت */
+  .card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 26px;
+    margin-bottom: 20px;
+    backdrop-filter: blur(10px);
+    transition: border-color 0.3s;
+  }
+  .card:hover { border-color: rgba(192,132,252,0.3); }
+  .card-title {
+    font-size: 1rem;
+    margin-bottom: 18px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #e0e0e0;
+    font-weight: 600;
+  }
+  .card-title .num {
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff6b9d, #c084fc);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.8rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+
+  /* Drop zone */
+  .drop-zone {
+    border: 2px dashed rgba(255,255,255,0.15);
+    border-radius: 16px;
+    padding: 45px 20px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: rgba(0,0,0,0.2);
+  }
+  .drop-zone:hover, .drop-zone.dragover {
+    border-color: #c084fc;
+    background: rgba(192,132,252,0.08);
+  }
+  .drop-zone .icon { font-size: 2.8rem; margin-bottom: 12px; display: block; }
+  .drop-zone .text { color: #ccc; font-size: 1rem; margin-bottom: 6px; }
+  .drop-zone .hint { color: #666; font-size: 0.8rem; }
+  .drop-zone input[type="file"] { display: none; }
+
+  /* پیش‌نمایش */
+  .preview-wrap {
+    display: none;
+    position: relative;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .preview-wrap.show { display: block; animation: fadeIn 0.3s; }
+  .preview-wrap img {
+    max-width: 100%;
+    max-height: 320px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .remove-btn {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: rgba(239,68,68,0.9);
+    border: none;
+    color: #fff;
+    cursor: pointer;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s;
+  }
+  .remove-btn:hover { transform: scale(1.1); }
+
+  /* ورودی‌ها */
+  textarea, select {
+    width: 100%;
+    padding: 14px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 0.95rem;
+    transition: border-color 0.2s;
+  }
+  textarea { min-height: 110px; resize: vertical; line-height: 1.7; }
+  textarea:focus, select:focus { outline: none; border-color: #c084fc; }
+  textarea::placeholder { color: #555; }
+
+  .options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+    margin-top: 16px;
+  }
+  .option-group label {
+    display: block;
+    font-size: 0.8rem;
+    color: #888;
+    margin-bottom: 6px;
+    font-weight: 500;
+  }
+
+  /* دکمه ساخت */
+  .generate-btn {
+    width: 100%;
+    margin-top: 20px;
+    padding: 17px;
+    background: linear-gradient(90deg, #ff6b9d, #c084fc, #60a5fa);
+    background-size: 200% 100%;
+    border: none;
+    border-radius: 14px;
+    color: #fff;
+    font-family: inherit;
+    font-size: 1.05rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 10px 30px rgba(192,132,252,0.3);
+  }
+  .generate-btn:hover:not(:disabled) {
+    background-position: 100% 0;
+    transform: translateY(-2px);
+    box-shadow: 0 15px 40px rgba(192,132,252,0.5);
+  }
+  .generate-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+  /* وضعیت */
+  .status {
+    display: none;
+    padding: 14px;
+    border-radius: 12px;
+    margin-top: 16px;
+    font-size: 0.9rem;
+    line-height: 1.7;
+  }
+  .status.show { display: block; animation: fadeIn 0.3s; }
+  .status.info { background: rgba(96,165,250,0.15); border: 1px solid rgba(96,165,250,0.4); color: #93c5fd; }
+  .status.error { background: rgba(239,68,68,0.15); border: 1px solid rgba(239,68,68,0.4); color: #fca5a5; }
+  .status.success { background: rgba(34,197,94,0.15); border: 1px solid rgba(34,197,94,0.4); color: #86efac; }
+
+  /* خروجی */
+  .output {
+    display: none;
+    margin-top: 20px;
+    text-align: center;
+    animation: fadeIn 0.4s;
+  }
+  .output.show { display: block; }
+  .output img {
+    max-width: 100%;
+    border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6);
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  .output .actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .output .actions a, .output .actions button {
+    padding: 11px 22px;
+    border-radius: 10px;
+    text-decoration: none;
+    font-size: 0.9rem;
+    font-family: inherit;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .output .actions a {
+    background: linear-gradient(90deg, #ff6b9d, #c084fc);
+    color: #fff;
+  }
+  .output .actions button {
+    background: rgba(255,255,255,0.08);
+    color: #ccc;
+  }
+  .output .actions a:hover, .output .actions button:hover { transform: scale(1.05); }
+
+  /* اسپینر */
+  .spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-left: 8px;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* فوتر */
+  .footer {
+    position: relative;
+    z-index: 10;
+    text-align: center;
+    padding: 30px 20px;
+    color: #555;
+    font-size: 0.85rem;
+    border-top: 1px solid rgba(255,255,255,0.05);
+    margin-top: 40px;
+    line-height: 1.8;
+  }
+  .footer a { color: #c084fc; text-decoration: none; }
+  .footer a:hover { text-decoration: underline; }
+
+  @media (max-width: 600px) {
+    .logo { font-size: 2.4rem; }
+    .options { grid-template-columns: 1fr; }
+    .container { padding: 20px 14px 40px; }
+    .card { padding: 20px; }
+    .header { padding: 30px 20px 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- نوار بالا -->
+<div class="topbar">
+  <div class="topbar-logo">
+    <span class="dot"></span>
+    WhySame
+  </div>
+  <button class="api-btn" id="apiBtn" onclick="openModal()">
+    🔑 <span id="apiBtnText">تنظیم API Key</span>
+  </button>
+</div>
+
+<!-- هدر -->
+<div class="header">
+  <div class="logo">
+    WhySame
+    <span>AI IMAGE STUDIO</span>
+  </div>
+  <p class="tagline">
+    عکست رو آپلود کن، بگو چی می‌خوای، و <strong>هوش مصنوعی</strong> برات می‌سازد.
+    کاملاً رایگان — فقط با کلید API خودت.
+  </p>
+</div>
+
+<!-- مودال API Key -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <h2>🔑 تنظیم API Key</h2>
+    <div id="keyStatus"></div>
+    <p>
+      برای استفاده، به یه API Key رایگان از Agnes AI نیاز داری.
+      کلید رو از
+      <a href="https://platform.agnes-ai.com" target="_blank">platform.agnes-ai.com</a>
+      بگیر. کلید فقط توی مرورگر خودت ذخیره می‌شه و به هیچ سروری فرستاده نمی‌شه.
+    </p>
+    <input type="password" id="apiKeyInput" placeholder="sk-..." />
+    <div class="modal-btns">
+      <button class="btn-secondary" onclick="closeModal()">انصراف</button>
+      <button class="btn-primary" onclick="saveKey()">ذخیره</button>
+    </div>
+  </div>
+</div>
+
+<!-- محتوا -->
+<div class="container">
+
+  <!-- آپلود عکس -->
+  <div class="card">
+    <div class="card-title">
+      <span class="num">۱</span>
+      عکس مبدأ رو آپلود کن
+      <span style="color:#666;font-size:0.85rem;font-weight:400;">(اختیاری)</span>
+    </div>
+    <div class="drop-zone" id="dropZone">
+      <span class="icon">📁</span>
+      <div class="text">عکس رو بکش و اینجا رها کن، یا کلیک کن</div>
+      <div class="hint">فرمت‌های مجاز: JPG, PNG, WEBP</div>
+      <input type="file" id="fileInput" accept="image/*" />
+    </div>
+    <div class="preview-wrap" id="previewWrap">
+      <button class="remove-btn" onclick="removeImage()" title="حذف">×</button>
+      <img id="previewImg" src="" alt="preview" />
+    </div>
+  </div>
+
+  <!-- پرامپت -->
+  <div class="card">
+    <div class="card-title">
+      <span class="num">۲</span>
+      تغییری که می‌خوای رو بنویس
+    </div>
+    <textarea id="prompt" placeholder="مثلاً: این عکس رو به سبک سایبرپانک شبانه با نورهای نئون تبدیل کن، ترکیب اصلی حفظ بشه"></textarea>
+    <div class="options">
+      <div class="option-group">
+        <label>اندازه عکس</label>
+        <select id="imageSize">
+          <option value="1024x1024">1:1 مربع</option>
+          <option value="1024x768">4:3 افقی</option>
+          <option value="768x1024">3:4 عمودی</option>
+          <option value="1312x736">16:9 افقی</option>
+          <option value="736x1312">9:16 عمودی</option>
+        </select>
+      </div>
+      <div class="option-group">
+        <label>مدل</label>
+        <select id="imageModel">
+          <option value="agnes-image-2.5-flash">2.5 Flash (جدیدترین)</option>
+          <option value="agnes-image-2.1-flash">2.1 Flash</option>
+          <option value="agnes-image-2.0-flash">2.0 Flash</option>
+        </select>
+      </div>
+    </div>
+    <button class="generate-btn" id="generateBtn" onclick="generateImage()">
+      🎨 ساخت عکس
+    </button>
+    <div class="status" id="status"></div>
+    <div class="output" id="output"></div>
+  </div>
+
+</div>
+
+<!-- فوتر -->
+<div class="footer">
+  ساخته شده با ❤️ برای <a href="https://whysame.dev" target="_blank">WhySame</a>
+  · قدرت گرفته از <a href="https://platform.agnes-ai.com" target="_blank">Agnes AI</a>
+</div>
+
+<script>
+const API_BASE = 'https://apihub.agnes-ai.com/v1';
+
+// ===== API Key Management =====
+function openModal() {
+  const modal = document.getElementById('modal');
+  const input = document.getElementById('apiKeyInput');
+  const currentKey = getKey();
+  input.value = currentKey;
+  updateKeyStatus();
+  modal.classList.add('open');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('open');
+}
+function updateKeyStatus() {
+  const statusEl = document.getElementById('keyStatus');
+  if (getKey()) {
+    statusEl.innerHTML = '<span class="status-badge ok">✅ کلید ذخیره شده</span>';
+  } else {
+    statusEl.innerHTML = '<span class="status-badge no">⚠️ کلیدی ذخیره نشده</span>';
+  }
+}
+function saveKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) return alert('کلید رو وارد کن');
+  localStorage.setItem('whysame_api_key', key);
+  updateKeyStatus();
+  updateApiBtn();
+  setTimeout(closeModal, 500);
+}
+function getKey() { return localStorage.getItem('whysame_api_key') || ''; }
+function updateApiBtn() {
+  const btn = document.getElementById('apiBtn');
+  const text = document.getElementById('apiBtnText');
+  if (getKey()) {
+    btn.classList.add('saved');
+    text.textContent = 'کلید تنظیم شد';
+  } else {
+    btn.classList.remove('saved');
+    text.textContent = 'تنظیم API Key';
+  }
+}
+
+// ===== Upload =====
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+
+dropZone.addEventListener('click', () => fileInput.click());
+dropZone.addEventListener('dragover', (e) => {
+  e.preventDefault();
+  dropZone.classList.add('dragover');
+});
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropZone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file && file.type.startsWith('image/')) {
+    fileInput.files = e.dataTransfer.files;
+    showPreview(file);
+  }
+});
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) showPreview(file);
+});
+
+function showPreview(file) {
+  const reader = new FileReader();
+  reader.onload = (ev) => {
+    document.getElementById('previewImg').src = ev.target.result;
+    document.getElementById('previewWrap').classList.add('show');
+  };
+  reader.readAsDataURL(file);
+}
+function removeImage() {
+  fileInput.value = '';
+  document.getElementById('previewImg').src = '';
+  document.getElementById('previewWrap').classList.remove('show');
+}
+
+// ===== Status =====
+function showStatus(msg, type) {
+  const el = document.getElementById('status');
+  el.innerHTML = msg;
+  el.className = 'status show ' + type;
+}
+function hideStatus() {
+  document.getElementById('status').className = 'status';
+}
+
+// ===== File to Data URI =====
+function fileToDataURI(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(reader.result);
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+// ===== Generate =====
+async function generateImage() {
+  const key = getKey();
+  if (!key) {
+    if (confirm('اول باید API Key رو تنظیم کنی. بریم به پنل تنظیمات؟')) {
+      openModal();
+    }
+    return;
+  }
+
+  const prompt = document.getElementById('prompt').value.trim();
+  if (!prompt) return alert('پرامپت رو وارد کن');
+
+  const size = document.getElementById('imageSize').value;
+  const model = document.getElementById('imageModel').value;
+  const file = fileInput.files[0];
+
+  const btn = document.getElementById('generateBtn');
+  btn.disabled = true;
+  showStatus('⏳ در حال ساخت عکس... <span class="spinner"></span>', 'info');
+  document.getElementById('output').classList.remove('show');
+  document.getElementById('output').innerHTML = '';
+
+  try {
+    const body = {
+      model: model,
+      prompt: prompt,
+      size: size,
+      extra_body: { response_format: 'url' }
+    };
+
+    if (file) {
+      const dataUri = await fileToDataURI(file);
+      body.extra_body.image = [dataUri];
+    }
+
+    const res = await fetch(`${API_BASE}/images/generations`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${key}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(body)
+    });
+
+    if (!res.ok) {
+      const err = await res.text();
+      throw new Error(`HTTP ${res.status}: ${err}`);
+    }
+
+    const data = await res.json();
+    const url = data.data && data.data[0] && data.data[0].url;
+
+    if (!url) throw new Error('URL عکس دریافت نشد');
+
+    showStatus('✅ عکس آماده شد!', 'success');
+    const outputEl = document.getElementById('output');
+    outputEl.innerHTML = `
+      <img src="${url}" alt="generated" />
+      <div class="actions">
+        <a href="${url}" download target="_blank">⬇️ دانلود</a>
+        <button onclick="copyUrl('${url}')">🔗 کپی لینک</button>
+      </div>
+    `;
+    outputEl.classList.add('show');
+
+  } catch (e) {
+    showStatus('❌ ' + e.message, 'error');
+  } finally {
+    btn.disabled = false;
+  }
+}
+
+function copyUrl(url) {
+  navigator.clipboard.writeText(url).then(() => {
+    alert('لینک کپی شد!');
+  });
+}
+
+// ===== Init =====
+window.addEventListener('DOMContentLoaded', () => {
+  updateApiBtn();
+  updateKeyStatus();
+});
+</script>
+</body>
+</html>    text-align: center;
     font-size: 2rem;
     margin-bottom: 10px;
     background: linear-gradient(90deg, #ff6b9d, #c084fc, #60a5fa);
